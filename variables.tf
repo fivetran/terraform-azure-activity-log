@@ -23,11 +23,6 @@ variable "diagnostic_settings_name" {
   default     = "lacework_activity_logs"
   description = "The name of the subscription's Diagnostic Setting for Activity Logs"
 }
-variable "lacework_integration_name" {
-  type        = string
-  default     = "TF activity log"
-  description = "The Lacework integration name"
-}
 variable "location" {
   type        = string
   description = "The Azure Region in which all resources should be created"
@@ -76,10 +71,3 @@ variable "use_existing_storage_account" {
   default     = false
   description = "Set this to `true` to use an existing Storage Account. Default behavior creates a new Storage Account"
 }
-variable "wait_time" {
-  type        = string
-  default     = "50s"
-  description = "Amount of time to wait before the Lacework resources are provisioned"
-}
-
-

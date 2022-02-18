@@ -27,3 +27,7 @@ output "subscription_ids" {
   value       = local.subscription_ids
   description = "The list of subscriptions that will send Activity Logs to the storage account"
 }
+output "queue_url" {
+  value       = local.queue_url
+  description = "The Lacework Azure Activity Log queue URL"
+}

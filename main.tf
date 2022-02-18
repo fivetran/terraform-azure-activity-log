@@ -19,6 +19,7 @@ locals {
     ) : (
     azurerm_resource_group.lacework[0].name
   )
+  queue_url = "https://${local.storage_account_name}.queue.core.windows.net/${azurerm_storage_queue.lacework.name}"
 }
 
 module "az_ad_application" {
@@ -167,32 +168,4 @@ resource "azurerm_role_assignment" "lacework" {
   role_definition_id = azurerm_role_definition.lacework.role_definition_resource_id
   principal_id       = local.service_principal_id
   scope              = "${data.azurerm_subscription.primary.id}/resourceGroups/${local.storage_account_resource_group}"
-}
-
-# wait for X seconds for the Azure resources to be created
-resource "time_sleep" "wait_time" {
-  create_duration = var.wait_time
-  depends_on = [
-    azurerm_eventgrid_event_subscription.lacework,
-    azurerm_storage_queue.lacework,
-    azurerm_role_assignment.lacework
-  ]
-  triggers = {
-    # If App ID changes, trigger a wait between lacework_integration_azure_al destroys and re-creates, to avoid API errors
-    app_id = local.application_id
-    # If the Integration object changes (like during upgrade to v1.0), trigger a wait between lacework_integration_azure_al destroys and re-creates, to avoid API errors
-    integration_name = var.lacework_integration_name
-  }
-
-}
-
-resource "lacework_integration_azure_al" "lacework" {
-  name      = var.lacework_integration_name
-  tenant_id = data.azurerm_subscription.primary.tenant_id
-  queue_url = "https://${local.storage_account_name}.queue.core.windows.net/${azurerm_storage_queue.lacework.name}"
-  credentials {
-    client_id     = local.application_id
-    client_secret = local.application_password
-  }
-  depends_on = [time_sleep.wait_time]
 }
